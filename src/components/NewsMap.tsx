@@ -1,29 +1,70 @@
-import React from 'react';
-// import { View, StyleSheet } from 'react-native';
-import MapView from 'react-native-maps';
+import React, { useEffect, useState } from 'react';
+import { View, Platform, PermissionsAndroid } from 'react-native';
+import MapboxGL from '@rnmapbox/maps';
+import Geolocation from 'react-native-geolocation-service';
 import styles from '../styles/NewsMap.styles';
 
-const NewsMap = ({ onHotspotPress }: { onHotspotPress: () => void }) => {
-  const heatmapPoints = [
-    { latitude: 37.7749, longitude: -122.4194, weight: 1 },
-    { latitude: 40.7128, longitude: -74.0060, weight: 2 },
-    { latitude: 51.5074, longitude: -0.1278, weight: 3 },
-  ];
+const NewsMap = () => {
+  const [coords, setCoords] = useState<[number, number] | null>(null);
+
+  const requestLocation = async () => {
+    try {
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+        );
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          console.warn('Android location permission denied');
+          return;
+        }
+      } else {
+        const auth = await Geolocation.requestAuthorization('whenInUse');
+        if (auth !== 'granted') {
+          console.warn('iOS location permission denied');
+          return;
+        }
+      }
+
+      Geolocation.getCurrentPosition(
+        position => {
+          const { latitude, longitude } = position.coords;
+          setCoords([longitude, latitude]);
+        },
+        error => {
+          console.log('Location error', error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 10000,
+        }
+      );
+    } catch (err) {
+      console.error('Permission error:', err);
+    }
+  };
+
+  useEffect(() => {
+    requestLocation();
+  }, []);
 
   return (
-    <MapView
-      style={styles.map}
-      initialRegion={{
-        latitude: 20,
-        longitude: 0,
-        latitudeDelta: 100,
-        longitudeDelta: 100,
-      }}
-    >
-      {/* <Heatmap points={heatmapPoints} radius={40} opacity={0.7} /> */}
-    </MapView>
+    <View style={styles.container}>
+      <MapboxGL.MapView style={styles.map} styleURL={MapboxGL.StyleURL.Light}>
+        <MapboxGL.Camera
+          centerCoordinate={coords ?? [0, 0]}
+          zoomLevel={coords ? 10 : 1}
+          animationMode="flyTo"
+          animationDuration={1000}
+        />
+        {coords && (
+          <MapboxGL.PointAnnotation id="user-location" coordinate={coords}>
+            <View />
+          </MapboxGL.PointAnnotation>
+        )}
+      </MapboxGL.MapView>
+    </View>
   );
 };
-
 
 export default NewsMap;

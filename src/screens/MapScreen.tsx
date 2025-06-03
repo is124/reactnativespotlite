@@ -15,7 +15,7 @@ const MapScreen = () => {
         <SearchHeader />
       </View>
       <View style={styles.mapContainer}>
-        <NewsMap onHotspotPress={() => setCardVisible(true)} />
+        <NewsMap />
       </View>
       <NewsCard visible={cardVisible} onClose={() => setCardVisible(false)} />
     </SafeAreaView>
