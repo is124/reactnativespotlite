@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
       padding: 24,
     },
     map: {
-      width: '110%',
+      width: '105%',
       height: '50%',
       marginBottom: 30,
       opacity: 0.5,

@@ -14,7 +14,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 const topics = ['Politics', 'Tech', 'Sports', 'Climate', 'Finance', 'Health'];
 const regions = ['World', 'India', 'Europe'];
 
-const InterestPicker = () => {
+const Interests = () => {
   const navigation = useNavigation();
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
@@ -27,12 +27,12 @@ const InterestPicker = () => {
     if (list.includes(item)) {
       setList(list.filter(i => i !== item));
     } else {
-      setList([...list, item]); 
+      setList([...list, item]);
     }
   };
 
   const handleContinue = () => {
-        // TODO: Implement navigation to GlobeView
+    navigation.navigate('MapScreen' as never);
   };
 
   return (
@@ -82,4 +82,4 @@ const InterestPicker = () => {
   );
 };
 
-export default InterestPicker;
+export default Interests;
